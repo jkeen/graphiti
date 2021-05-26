@@ -40,7 +40,9 @@ module Graphiti
         def build(params, base_scope = nil)
           validate!(params)
           runner = Runner.new(self, params)
-          runner.proxy(base_scope, single: true, raise_on_missing: true)
+          runner.proxy(base_scope, single: true, raise_on_missing: true).tap do |instance|
+            instance.assign_attributes # assign the params to the underlying model
+          end
         end
 
         private

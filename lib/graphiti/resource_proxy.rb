@@ -74,6 +74,7 @@ module Graphiti
       end
     end
     alias to_a data
+    alias resolve_data data
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
@@ -97,6 +98,16 @@ module Graphiti
 
     def pagination
       @pagination ||= Delegates::Pagination.new(self)
+    end
+
+    def assign_attributes(params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships,
+      )
     end
 
     def save(action: :create)
@@ -130,7 +141,7 @@ module Graphiti
     end
 
     def destroy
-      data
+      resolve_data
       transaction_response = @resource.transaction do
         metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
@@ -148,7 +159,8 @@ module Graphiti
     end
 
     def update_attributes
-      data
+      resolve_data
+      assign_attributes
       save(action: :update)
     end
 
