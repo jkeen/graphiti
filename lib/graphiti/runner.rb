@@ -70,7 +70,8 @@ module Graphiti
         query,
         payload: deserialized_payload,
         single: opts[:single],
-        raise_on_missing: opts[:raise_on_missing]
+        raise_on_missing: opts[:raise_on_missing],
+        data: opts[:data]
     end
   end
 end
