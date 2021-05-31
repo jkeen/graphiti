@@ -98,8 +98,9 @@ module Graphiti
     end
 
     def strip_relationships?
-      return false unless Graphiti.config.links_on_demand
-      params = Graphiti.context[:object].params || {}
+      return false unless Graphiti.config.links_on_demand 
+
+      params = Graphiti.context[:object].try(:params) || {}
       [false, nil, "false"].include?(params[:links])
     end
   end
