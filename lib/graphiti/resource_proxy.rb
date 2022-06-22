@@ -4,6 +4,7 @@ module Graphiti
 
     attr_reader :resource, :query, :scope, :payload
 
+    delegate :cache_key, :cache_key_with_version, to: :scope
     def initialize(resource, scope, query,
       payload: nil,
       single: false,

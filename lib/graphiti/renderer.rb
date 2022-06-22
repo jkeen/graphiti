@@ -68,7 +68,9 @@ module Graphiti
         options[:meta][:debug] = Debugger.to_a if debug_json?
         options[:proxy] = proxy
 
-        renderer.render(records, options)
+        Graphiti.cache("#{proxy.cache_key_with_version}/render") do
+          renderer.render(records, options)
+        end
       end
     end
 

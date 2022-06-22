@@ -100,6 +100,12 @@ module Graphiti
       r.apply_sideloads_to_serializer
     end
   end
+
+  def self.cache(name, &block)
+    ::Rails.cache.fetch(name) do
+      block.call
+    end
+  end
 end
 
 require "graphiti/version"

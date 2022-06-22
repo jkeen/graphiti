@@ -66,6 +66,30 @@ module Graphiti
       end
     end
 
+
+    def parent_resource
+      @resource
+    end
+
+    def cache_key_with_version
+      @object = @resource.before_resolve(@object, @query)
+      results = @resource.resolve(@object)
+
+      cache_keys = []
+      unless @query.sideloads.empty?
+        @query.sideloads.each_pair do |name, q|
+          sideload = @resource.class.sideload(name)
+          next if sideload.nil? || sideload.shared_remote?
+
+          cache_keys << sideload.build_resource_proxy(results, q, parent_resource).cache_key_with_version
+        end
+      end
+
+      cache_keys << @object.cache_key_with_version
+
+      cache_keys.flatten.join('+')
+    end
+
     private
 
     def broadcast_data
