@@ -199,6 +199,10 @@ module Graphiti
       query.debug_requested?
     end
 
+    def etag
+      "W/#{ActiveSupport::Digest.hexdigest(cache_key.to_s)}"
+    end
+
     def cache_key
       [@scope.cache_key, @query.cache_key]
     end
