@@ -2,19 +2,40 @@ module Graphiti
   class ResourceProxy
     include Enumerable
 
-    attr_reader :resource, :query, :scope, :payload
+    attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache
 
-    delegate :cache_key, :cache_key_with_version, to: :scope
     def initialize(resource, scope, query,
+<<<<<<< HEAD
       payload: nil,
       single: false,
       raise_on_missing: false)
+||||||| parent of ae399a0 (Allow conditional caching and ability to specify expiration time from the resource level)
+      payload: nil,
+      single: false,
+      raise_on_missing: false,
+      data: nil)
+
+=======
+                   payload: nil,
+                   single: false,
+                   raise_on_missing: false,
+                   data: nil,
+                   cache: nil,
+                   cache_expires_in: nil)
+
+>>>>>>> ae399a0 (Allow conditional caching and ability to specify expiration time from the resource level)
       @resource = resource
       @scope = scope
       @query = query
       @payload = payload
       @single = single
       @raise_on_missing = raise_on_missing
+      @cache = cache
+      @cache_expires_in = cache_expires_in
+    end
+
+    def cache?
+      !!@cache
     end
 
     def single?
@@ -176,6 +197,10 @@ module Graphiti
 
     def debug_requested?
       query.debug_requested?
+    end
+
+    def cache_key
+      [@scope.cache_key, @query.cache_key]
     end
 
     private

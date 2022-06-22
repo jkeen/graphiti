@@ -66,12 +66,20 @@ module Graphiti
       end
     end
 
-
     def parent_resource
       @resource
     end
 
-    def cache_key_with_version
+    def cache_key
+      query_cache_key
+    end
+
+    private
+
+    def query_cache_key
+      # This is the combined cache key for the base query and the query for all sideloads
+      # If any returned model's updated_at changes, this key will change
+
       @object = @resource.before_resolve(@object, @query)
       results = @resource.resolve(@object)
 
@@ -81,12 +89,11 @@ module Graphiti
           sideload = @resource.class.sideload(name)
           next if sideload.nil? || sideload.shared_remote?
 
-          cache_keys << sideload.build_resource_proxy(results, q, parent_resource).cache_key_with_version
+          cache_keys << sideload.build_resource_proxy(results, q, parent_resource).cache_key
         end
       end
 
       cache_keys << @object.cache_key_with_version
-
       cache_keys.flatten.join('+')
     end
 

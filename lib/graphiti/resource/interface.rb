@@ -4,25 +4,27 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
-        def all(params = {}, base_scope = nil)
-          validate!(params)
-          _all(params, {}, base_scope)
+        def all(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
+          validate_request!(params)
+          _all(params, {}, base_scope, cache: cache, cache_expires_in: cache_expires_in)
         end
 
         # @api private
-        def _all(params, opts, base_scope)
+        def _all(params, opts, base_scope, cache: false, cache_expires_in: false)
           runner = Runner.new(self, params, opts.delete(:query), :all)
           opts[:params] = params
+          opts[:cache] = cache
+          opts[:cache_expires_in] = cache_expires_in
           runner.proxy(base_scope, opts)
         end
 
-        def find(params = {}, base_scope = nil)
-          validate!(params)
-          _find(params, base_scope)
+        def find(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
+          validate_request!(params)
+          _find(params, base_scope, cache: cache, cache_expires_in: cache_expires_in)
         end
 
         # @api private
-        def _find(params = {}, base_scope = nil)
+        def _find(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
           guard_nil_id!(params[:data])
           guard_nil_id!(params)
 
@@ -32,9 +34,11 @@ module Graphiti
 
           runner = Runner.new(self, params, nil, :find)
           runner.proxy base_scope,
-            single: true,
-            raise_on_missing: true,
-            bypass_required_filters: true
+                       single: true,
+                       raise_on_missing: true,
+                       bypass_required_filters: true,
+                       cache: cache,
+                       cache_expires_in: cache_expires_in
         end
 
         def build(params, base_scope = nil)
