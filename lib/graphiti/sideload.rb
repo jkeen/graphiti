@@ -235,8 +235,7 @@ module Graphiti
     end
 
     def load(parents, query, graph_parent)
-      @resource_proxy ||= build_resource_proxy(parents, query, graph_parent)
-      @resource_proxy.to_a
+      build_resource_proxy(parents, query, graph_parent).to_a
     end
 
     # Override in subclass

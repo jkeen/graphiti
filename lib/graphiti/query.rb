@@ -230,7 +230,7 @@ module Graphiti
     end
 
     def cache_key
-      query_cache_key
+      "args-#{query_cache_key}"
     end
 
     private

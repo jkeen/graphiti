@@ -38,6 +38,8 @@ module Graphiti
       !!@cache
     end
 
+    alias cached? cache?
+
     def single?
       !!@single
     end
@@ -197,6 +199,10 @@ module Graphiti
 
     def debug_requested?
       query.debug_requested?
+    end
+
+    def updated_at
+      @scope.updated_at
     end
 
     def etag

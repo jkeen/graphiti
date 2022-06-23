@@ -74,6 +74,10 @@ module Graphiti
       query_cache_key
     end
 
+    def updated_at
+      last_modified_at
+    end
+
     private
 
     def query_cache_key
@@ -93,8 +97,27 @@ module Graphiti
         end
       end
 
-      cache_keys << @object.cache_key_with_version
+      cache_keys << @object.cache_key_with_version # this is what calls into ActiveRecord
       cache_keys.flatten.join('+')
+    end
+
+    def last_modified_at
+      @object = @resource.before_resolve(@object, @query)
+      results = @resource.resolve(@object)
+      updated_ats = []
+      unless @query.sideloads.empty?
+        @query.sideloads.each_pair do |name, q|
+
+          puts "SIDELOAD: #{name}"
+          sideload = @resource.class.sideload(name)
+          next if sideload.nil? || sideload.shared_remote?
+
+          updated_ats << sideload.build_resource_proxy(results, q, parent_resource).updated_at
+        end
+      end
+
+      updated_at = @object.maximum(:updated_at) # this is what makes the query
+      updated_ats.concat([updated_at]).max
     end
 
     private
