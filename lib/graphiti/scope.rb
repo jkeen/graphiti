@@ -94,7 +94,7 @@ module Graphiti
       updated_ats = sideload_resource_proxies.map(&:updated_at)
 
       begin
-        updated_ats <<  @object.maximum(:updated_at)
+        updated_ats << @object.maximum(:updated_at)
       rescue StandardError => e
         Graphiti.log("error calculating last_modified_at for #{@resource.class.to_s}")
         Graphiti.log(e)
@@ -120,7 +120,7 @@ module Graphiti
               proxies << sideload.build_resource_proxy(results, q, parent_resource)
             end
           end
-        end
+        end.flatten
       end
     end
 

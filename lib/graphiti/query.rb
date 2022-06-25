@@ -1,3 +1,5 @@
+require 'digest'
+
 module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action
