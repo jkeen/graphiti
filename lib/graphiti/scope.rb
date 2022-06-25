@@ -107,8 +107,6 @@ module Graphiti
       updated_ats = []
       unless @query.sideloads.empty?
         @query.sideloads.each_pair do |name, q|
-
-          puts "SIDELOAD: #{name}"
           sideload = @resource.class.sideload(name)
           next if sideload.nil? || sideload.shared_remote?
 
