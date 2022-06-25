@@ -101,8 +101,8 @@ module Graphiti
     end
   end
 
-  def self.cache(name, expires_in: false, &block)
-    ::Rails.cache.fetch(name, expires_in: expires_in) do
+  def self.cache(name, kwargs = {}, &block)
+    ::Rails.cache.fetch(name, **kwargs) do
       block.call
     end
   end

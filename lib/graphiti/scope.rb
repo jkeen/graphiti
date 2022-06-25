@@ -140,7 +140,7 @@ module Graphiti
       end
 
       updated_at = @object.maximum(:updated_at) # this is what makes the query
-      updated_ats.concat([updated_at]).max
+      updated_ats.concat([updated_at]).compact.max
     end
 
     private
