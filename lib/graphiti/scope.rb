@@ -74,6 +74,10 @@ module Graphiti
       query_cache_key
     end
 
+    def cache_key_with_version
+      query_cache_key_with_version
+    end
+
     def updated_at
       last_modified_at
     end
@@ -82,7 +86,7 @@ module Graphiti
 
     def query_cache_key
       # This is the combined cache key for the base query and the query for all sideloads
-      # If any returned model's updated_at changes, this key will change
+      # Changing the query will yield a different cache key
 
       @object = @resource.before_resolve(@object, @query)
       results = @resource.resolve(@object)
@@ -97,8 +101,29 @@ module Graphiti
         end
       end
 
+      cache_keys << @object.cache_key # this is what calls into ActiveRecord
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten)
+    end
+
+    def query_cache_key_with_version
+      # This is the combined and versioned cache key for the base query and the query for all sideloads
+      # If any returned model's updated_at changes, this key will change
+
+      @object = @resource.before_resolve(@object, @query)
+      results = @resource.resolve(@object)
+
+      cache_keys = []
+      unless @query.sideloads.empty?
+        @query.sideloads.each_pair do |name, q|
+          sideload = @resource.class.sideload(name)
+          next if sideload.nil? || sideload.shared_remote?
+
+          cache_keys << sideload.build_resource_proxy(results, q, parent_resource).cache_key_with_version
+        end
+      end
+
       cache_keys << @object.cache_key_with_version # this is what calls into ActiveRecord
-      cache_keys.flatten.join('+')
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten)
     end
 
     def last_modified_at

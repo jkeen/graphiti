@@ -69,8 +69,8 @@ module Graphiti
         options[:proxy] = proxy
 
         if proxy.cache?
-          Graphiti.cache("#{proxy.cache_key}/render", expires_in: proxy.cache_expires_in) do
-            options.delete(:cache) # JSONAPI-Resources has some janky caching logic built-in that does not work well.
+          Graphiti.cache("#{proxy.cache_key}/render", version: proxy.updated_at, expires_in: proxy.cache_expires_in) do
+            options.delete(:cache) # ensure that we don't use JSONAPI-Resources's built-in caching logic
             renderer.render(records, options)
           end
         else

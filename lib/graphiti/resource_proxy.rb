@@ -229,11 +229,15 @@ module Graphiti
     end
 
     def etag
-      "W/#{ActiveSupport::Digest.hexdigest(cache_key.to_s)}"
+      "W/#{ActiveSupport::Digest.hexdigest(cache_key_with_version.to_s)}"
     end
 
     def cache_key
-      [@scope.cache_key, @query.cache_key]
+      ActiveSupport::Cache.expand_cache_key([@scope.cache_key, @query.cache_key])
+    end
+
+    def cache_key_with_version
+      ActiveSupport::Cache.expand_cache_key([@scope.cache_key_with_version, @query.cache_key])
     end
 
     private
