@@ -126,17 +126,15 @@ RSpec.describe Graphiti::Scope do
     end
   end
 
-
   describe "cache_key" do
-
     let(:employee1) {
       time = Time.parse("2022-06-24 16:36:00.000000000 -0500")
-      double(cache_key: 'employee/1', cache_key_with_version: "employee/1-#{time.to_i}", updated_at: time).as_null_object
+      double(cache_key: "employee/1", cache_key_with_version: "employee/1-#{time.to_i}", updated_at: time).as_null_object
     }
 
     let(:employee2) {
       time = Time.parse("2022-06-24 16:37:00.000000000 -0500")
-      double(cache_key: 'employee/2', cache_key_with_version: "employee/2-#{time.to_i}", updated_at: time).as_null_object
+      double(cache_key: "employee/2", cache_key_with_version: "employee/2-#{time.to_i}", updated_at: time).as_null_object
     }
 
     it "generates a stable key" do
@@ -149,7 +147,7 @@ RSpec.describe Graphiti::Scope do
 
     it "only caches off of the scoped object " do
       instance1 = described_class.new(employee1, resource, query)
-      instance2 = described_class.new(employee1, resource, Graphiti::Query.new(resource, { extra_fields: {positions: ['foo']}}))
+      instance2 = described_class.new(employee1, resource, Graphiti::Query.new(resource, {extra_fields: {positions: ["foo"]}}))
 
       expect(instance1.cache_key).to be_present
       expect(instance2.cache_key).to be_present

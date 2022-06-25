@@ -1070,7 +1070,7 @@ RSpec.describe Graphiti::Query do
 
     it "generates a different key with different params" do
       instance1 = described_class.new(resource, params)
-      instance2 = described_class.new(resource, { extra_fields: {'positions': ['foo']} })
+      instance2 = described_class.new(resource, {extra_fields: {positions: ["foo"]}})
 
       expect(instance1.cache_key).to be_present
       expect(instance2.cache_key).to be_present

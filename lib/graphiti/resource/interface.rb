@@ -4,6 +4,11 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
+        def cache_resource(expires_in: false)
+          @cache_resource = true
+          @cache_expires_in = expires_in
+        end
+
         def all(params = {}, base_scope = nil)
           params ||= {}
           validate_request!(params)
@@ -15,7 +20,7 @@ module Graphiti
           runner = Runner.new(self, params, opts.delete(:query), :all)
           opts[:params] = params
 
-          runner.proxy(base_scope, opts.merge(cache: params.delete(:cache), cache_expires_in: params.delete(:cache_expires_in)))
+          runner.proxy(base_scope, opts.merge(caching_options))
         end
 
         def find(params = {}, base_scope = nil)
@@ -34,12 +39,14 @@ module Graphiti
           params[:filter][:id] = id if id
 
           runner = Runner.new(self, params, nil, :find)
-          runner.proxy base_scope,
-                       single: true,
-                       raise_on_missing: true,
-                       bypass_required_filters: true,
-                       cache: params.delete(:cache),
-                       cache_expires_in:  params.delete(:cache_expires_in)
+
+          find_options = {
+            single: true,
+            raise_on_missing: true,
+            bypass_required_filters: true
+          }.merge(caching_options)
+
+          runner.proxy base_scope, find_options
         end
 
         def build(params = {}, base_scope = nil)
@@ -50,11 +57,15 @@ module Graphiti
 
         private
 
+        def caching_options
+          {cache: @cache_resource, cache_expires_in: @cache_expires_in}
+        end
+
         def validate_request!(params)
           return if Graphiti.context[:graphql] || !validate_endpoints?
 
           if context&.respond_to?(:request)
-            path = context.request.env['PATH_INFO']
+            path = context.request.env["PATH_INFO"]
             unless allow_request?(path, params, context_namespace)
               raise Errors::InvalidEndpoint.new(self, path, context_namespace)
             end

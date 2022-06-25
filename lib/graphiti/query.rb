@@ -1,4 +1,4 @@
-require 'digest'
+require "digest"
 
 module Graphiti
   class Query
@@ -228,7 +228,7 @@ module Graphiti
     end
 
     def paginate?
-      ![false, 'false'].include?(@params[:paginate])
+      ![false, "false"].include?(@params[:paginate])
     end
 
     def cache_key
@@ -238,14 +238,15 @@ module Graphiti
     private
 
     def query_cache_key
-      attrs = { extra_fields: extra_fields,
-                fields: fields,
-                links: links?,
-                pagination_links: pagination_links?,
-                format: params[:format] }
+      attrs = {extra_fields: extra_fields,
+               fields: fields,
+               links: links?,
+               pagination_links: pagination_links?,
+               format: params[:format]}
 
       Digest::SHA1.hexdigest(attrs.to_s)
     end
+
     def cast_page_param(name, value)
       if [:before, :after].include?(name)
         decode_cursor(value)

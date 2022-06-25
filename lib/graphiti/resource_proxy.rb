@@ -5,17 +5,6 @@ module Graphiti
     attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache
 
     def initialize(resource, scope, query,
-<<<<<<< HEAD
-      payload: nil,
-      single: false,
-      raise_on_missing: false)
-||||||| parent of ae399a0 (Allow conditional caching and ability to specify expiration time from the resource level)
-      payload: nil,
-      single: false,
-      raise_on_missing: false,
-      data: nil)
-
-=======
                    payload: nil,
                    single: false,
                    raise_on_missing: false,
@@ -23,7 +12,6 @@ module Graphiti
                    cache: nil,
                    cache_expires_in: nil)
 
->>>>>>> ae399a0 (Allow conditional caching and ability to specify expiration time from the resource level)
       @resource = resource
       @scope = scope
       @query = query
@@ -38,7 +26,7 @@ module Graphiti
       !!@cache
     end
 
-    alias cached? cache?
+    alias_method :cached?, :cache?
 
     def single?
       !!@single
@@ -128,30 +116,6 @@ module Graphiti
       @pagination ||= Delegates::Pagination.new(self)
     end
 
-<<<<<<< HEAD
-||||||| parent of fcedbec (Move cache params in to params and prevent the deeply buried jsonapi-resources from freaking out about it)
-    def assign_attributes(params = nil)
-      # deserialize params again?
-
-      @data = @resource.assign_with_relationships(
-        @payload.meta,
-        @payload.attributes,
-        @payload.relationships
-      )
-    end
-
-=======
-    def assign_attributes(_params = nil)
-      # deserialize params again?
-
-      @data = @resource.assign_with_relationships(
-        @payload.meta,
-        @payload.attributes,
-        @payload.relationships
-      )
-    end
-
->>>>>>> fcedbec (Move cache params in to params and prevent the deeply buried jsonapi-resources from freaking out about it)
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
@@ -185,7 +149,7 @@ module Graphiti
     def destroy
       data
       transaction_response = @resource.transaction do
-        metadata = { method: :destroy }
+        metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         @resource.after_graph_persist(model, metadata)
@@ -194,7 +158,7 @@ module Graphiti
         validator.validate!
         @resource.before_commit(model, metadata)
 
-        { result: validator }
+        {result: validator}
       end
       @data, success = transaction_response[:result].to_a
       success

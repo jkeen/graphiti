@@ -74,20 +74,20 @@ module Graphiti
       # This is the combined cache key for the base query and the query for all sideloads
       # Changing the query will yield a different cache key
 
-      cache_keys = sideload_resource_proxies.map(&:cache_key)
+      cache_keys = sideload_resource_proxies.map { |proxy| proxy.try(:cache_key) }
 
-      cache_keys << @object.cache_key # this is what calls into ActiveRecord
-      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten)
+      cache_keys << @object.try(:cache_key) # this is what calls into the ORM (ActiveRecord, most likely)
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten.compact)
     end
 
     def cache_key_with_version
       # This is the combined and versioned cache key for the base query and the query for all sideloads
       # If any returned model's updated_at changes, this key will change
 
-      cache_keys = sideload_resource_proxies.map(&:cache_key_with_version)
+      cache_keys = sideload_resource_proxies.map { |proxy| proxy.try(:cache_key_with_version) }
 
-      cache_keys << @object.cache_key_with_version # this is what calls into ActiveRecord
-      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten)
+      cache_keys << @object.try(:cache_key_with_version) # this is what calls into ORM (ActiveRecord, most likely)
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten.compact)
     end
 
     def updated_at
@@ -95,14 +95,14 @@ module Graphiti
 
       begin
         updated_ats << @object.maximum(:updated_at)
-      rescue StandardError => e
-        Graphiti.log("error calculating last_modified_at for #{@resource.class.to_s}")
+      rescue => e
+        Graphiti.log("error calculating last_modified_at for #{@resource.class}")
         Graphiti.log(e)
       end
 
       updated_ats.compact.max
     end
-    alias last_modified_at updated_at
+    alias_method :last_modified_at, :updated_at
 
     private
 
