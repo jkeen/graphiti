@@ -4,27 +4,28 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
-        def all(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
+        def all(params = {}, base_scope = nil)
+          params ||= {}
           validate_request!(params)
-          _all(params, {}, base_scope, cache: cache, cache_expires_in: cache_expires_in)
+          _all(params, {}, base_scope)
         end
 
         # @api private
-        def _all(params, opts, base_scope, cache: false, cache_expires_in: false)
+        def _all(params, opts, base_scope)
           runner = Runner.new(self, params, opts.delete(:query), :all)
           opts[:params] = params
-          opts[:cache] = cache
-          opts[:cache_expires_in] = cache_expires_in
-          runner.proxy(base_scope, opts)
+
+          runner.proxy(base_scope, opts.merge(cache: params.delete(:cache), cache_expires_in: params.delete(:cache_expires_in)))
         end
 
-        def find(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
+        def find(params = {}, base_scope = nil)
+          params ||= {}
           validate_request!(params)
-          _find(params, base_scope, cache: cache, cache_expires_in: cache_expires_in)
+          _find(params, base_scope)
         end
 
         # @api private
-        def _find(params = {}, base_scope = nil, cache: false, cache_expires_in: false)
+        def _find(params = {}, base_scope = nil)
           guard_nil_id!(params[:data])
           guard_nil_id!(params)
 
@@ -37,23 +38,23 @@ module Graphiti
                        single: true,
                        raise_on_missing: true,
                        bypass_required_filters: true,
-                       cache: cache,
-                       cache_expires_in: cache_expires_in
+                       cache: params.delete(:cache),
+                       cache_expires_in:  params.delete(:cache_expires_in)
         end
 
-        def build(params, base_scope = nil)
-          validate!(params)
+        def build(params = {}, base_scope = nil)
+          validate_request!(params)
           runner = Runner.new(self, params)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 
         private
 
-        def validate!(params)
+        def validate_request!(params)
           return if Graphiti.context[:graphql] || !validate_endpoints?
 
           if context&.respond_to?(:request)
-            path = context.request.env["PATH_INFO"]
+            path = context.request.env['PATH_INFO']
             unless allow_request?(path, params, context_namespace)
               raise Errors::InvalidEndpoint.new(self, path, context_namespace)
             end
@@ -62,9 +63,7 @@ module Graphiti
 
         def guard_nil_id!(params)
           return unless params
-          if params.key?(:id) && params[:id].nil?
-            raise Errors::UndefinedIDLookup.new(self)
-          end
+          raise Errors::UndefinedIDLookup, self if params.key?(:id) && params[:id].nil?
         end
       end
     end

@@ -98,7 +98,11 @@ module Graphiti
           took = ((stop - start) * 1000.0).round(2)
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
-          logs << ["Rendering:", :green, true]
+          if payload.dig(:options, :cache)
+            logs << ["Rendering (cached):", :green, true]
+          else
+            logs << ["Rendering:", :green, true]
+          end
           logs << ["Took: #{took}ms", :magenta, true]
         end
       end

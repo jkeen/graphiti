@@ -90,9 +90,8 @@ module Graphiti
     def data
       @data ||= begin
         records = @scope.resolve
-        if records.empty? && raise_on_missing?
-          raise Graphiti::Errors::RecordNotFound
-        end
+        raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
         records = records[0] if single?
         records
       end
@@ -129,6 +128,30 @@ module Graphiti
       @pagination ||= Delegates::Pagination.new(self)
     end
 
+<<<<<<< HEAD
+||||||| parent of fcedbec (Move cache params in to params and prevent the deeply buried jsonapi-resources from freaking out about it)
+    def assign_attributes(params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships
+      )
+    end
+
+=======
+    def assign_attributes(_params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships
+      )
+    end
+
+>>>>>>> fcedbec (Move cache params in to params and prevent the deeply buried jsonapi-resources from freaking out about it)
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
@@ -136,12 +159,12 @@ module Graphiti
       begin
         Graphiti.context[:namespace] = action
         ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
-        validator = persist {
+        validator = persist do
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
             @payload.relationships
-        }
+        end
       ensure
         Graphiti.context[:namespace] = original
       end
@@ -162,7 +185,7 @@ module Graphiti
     def destroy
       data
       transaction_response = @resource.transaction do
-        metadata = {method: :destroy}
+        metadata = { method: :destroy }
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         @resource.after_graph_persist(model, metadata)
@@ -171,7 +194,7 @@ module Graphiti
         validator.validate!
         @resource.before_commit(model, metadata)
 
-        {result: validator}
+        { result: validator }
       end
       @data, success = transaction_response[:result].to_a
       success
