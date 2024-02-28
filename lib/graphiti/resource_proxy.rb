@@ -81,8 +81,8 @@ module Graphiti
       end
     end
 
-    alias to_a data
-    alias resolve_data data
+    alias_method :to_a, :data
+    alias_method :resolve_data, :data
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}

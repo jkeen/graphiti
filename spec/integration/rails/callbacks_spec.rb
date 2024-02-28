@@ -35,7 +35,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       class EmployeeResource < ApplicationResource
         self.model = Employee
-        self.type= "employees"
+        self.type = "employees"
 
         before_attributes :one
         before_attributes :two
@@ -208,7 +208,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       {
         data: {
           type: "employees",
-          attributes: { first_name: "Jane"}
+          attributes: {first_name: "Jane"}
         }
       }
     end
@@ -244,15 +244,13 @@ if ENV["APPRAISAL_INITIALIZED"]
       describe "update callbacks" do
         let!(:employee) { Employee.create!(first_name: "asdf") }
         let(:payload) {
-          { id: employee.id, 
-              data: {
-                id: employee.id,
-                type: 'employees',
-                attributes: { first_name: "Jane" }
-              }
-            }
+          {id: employee.id,
+           data: {
+             id: employee.id,
+             type: "employees",
+             attributes: {first_name: "Jane"}
+           }}
         }
-
 
         it "fires hooks in order" do
           expect {

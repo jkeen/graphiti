@@ -76,10 +76,10 @@ module Graphiti
 
         run_callbacks :attributes, action_name, assign_params, meta do |params|
           model_instance = if action_name != :create && id
-                             self.class._find(id: id).data
-                           else
-                             call_with_meta(:build, model, meta)
-                           end
+            self.class._find(id: id).data
+          else
+            call_with_meta(:build, model, meta)
+          end
           call_with_meta(:assign_attributes, model_instance, params, meta)
           model_instance
         end
