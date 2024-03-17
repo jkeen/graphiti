@@ -9,7 +9,8 @@ module Graphiti
       single: false,
       raise_on_missing: false,
       cache: nil,
-      cache_expires_in: nil)
+      cache_expires_in: nil,
+      data: nil)
 
       @resource = resource
       @scope = scope
@@ -74,6 +75,11 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
+    def data=(models)
+      @data = data
+      [@data].flatten.compact.each { |r| @resource.decorate_record(r) }
+    end
+
     def data
       @data ||= begin
         records = @scope.resolve
@@ -84,7 +90,9 @@ module Graphiti
         records
       end
     end
+
     alias_method :to_a, :data
+    alias_method :resolve_data, :data
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
@@ -114,6 +122,16 @@ module Graphiti
 
     def pagination
       @pagination ||= Delegates::Pagination.new(self)
+    end
+
+    def assign_attributes(params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships
+      )
     end
 
     def save(action: :create)
@@ -147,7 +165,7 @@ module Graphiti
     end
 
     def destroy
-      data
+      resolve_data
       transaction_response = @resource.transaction do
         metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
@@ -165,7 +183,7 @@ module Graphiti
     end
 
     def update
-      data
+      resolve_data
       save(action: :update)
     end
 
