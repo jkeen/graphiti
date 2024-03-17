@@ -16,6 +16,7 @@ require "jsonapi/serializable"
 
 module Graphiti
   DEPRECATOR = ActiveSupport::Deprecation.new("2.0", "Graphiti")
+  CACHE_PREFIX = 'graphiti'
 
   # @api private
   def self.context
@@ -104,6 +105,12 @@ module Graphiti
   def self.setup!
     resources.each do |r|
       r.apply_sideloads_to_serializer
+    end
+  end
+
+  def self.cache(name, kwargs = {}, &block)
+    ::Rails.cache.fetch([CACHE_PREFIX, name].join('/'), **kwargs) do
+      block.call
     end
   end
 end
