@@ -1,4 +1,56 @@
-## Unreleased
+graphiti changelog
+
+# [1.6.0](https://github.com/graphiti-api/graphiti/compare/v1.5.3...v1.6.0) (2024-03-20)
+
+
+### Features
+
+* add thread pool and concurrency_max_threads configuration option ([#470](https://github.com/graphiti-api/graphiti/issues/470)) ([697d761](https://github.com/graphiti-api/graphiti/commit/697d76172adec24cd7e7522300c8335233fdcc36))
+
+## [1.5.3](https://github.com/graphiti-api/graphiti/compare/v1.5.2...v1.5.3) (2024-03-18)
+
+
+### Bug Fixes
+
+* leverage ruby-2.7 parameter forwarding ([#431](https://github.com/graphiti-api/graphiti/issues/431)) ([ae09a46](https://github.com/graphiti-api/graphiti/commit/ae09a464b2156742bb093537deac0578a1a3e40e))
+* prevent :id stripping when :id not in path ([#447](https://github.com/graphiti-api/graphiti/issues/447)) ([e1dd811](https://github.com/graphiti-api/graphiti/commit/e1dd811283f6e6fe7a36b925934df0ecbb4d3411))
+
+## [1.5.2](https://github.com/graphiti-api/graphiti/compare/v1.5.1...v1.5.2) (2024-03-18)
+
+
+### Bug Fixes
+
+* Enum should allow the conventionally case-sensitive operators ([#434](https://github.com/graphiti-api/graphiti/issues/434)) ([56d34fd](https://github.com/graphiti-api/graphiti/commit/56d34fd4801bc32c13d64aca880b82b717b2ab81))
+
+## [1.5.1](https://github.com/graphiti-api/graphiti/compare/v1.5.0...v1.5.1) (2024-03-18)
+
+
+### Bug Fixes
+
+* polymorphic `on` expects a symbol ([#433](https://github.com/graphiti-api/graphiti/issues/433)) ([4e58702](https://github.com/graphiti-api/graphiti/commit/4e587021265323bd0b170b57e9c7aecaa7f826d7))
+
+# [1.5.0](https://github.com/graphiti-api/graphiti/compare/v1.4.0...v1.5.0) (2024-03-18)
+
+
+### Features
+
+* add before_sideload hook ([#371](https://github.com/graphiti-api/graphiti/issues/371)) ([f68b61f](https://github.com/graphiti-api/graphiti/commit/f68b61ff09ec61ecf23acc5bc37d0accba14aeed))
+
+## 1.4.0, Sun March 17th 2024
+Features: 
+- [461](https://github.com/graphiti-api/graphiti/pull/461), [463](https://github.com/graphiti-api/graphiti/pull/463) Add support for Rails 7.1 + Ruby 3.2 + Ruby 3.3
+
+Fixes: 
+- [464](https://github.com/graphiti-api/graphiti/pull/464) Check for url presence before trying to append
+- [407](https://github.com/graphiti-api/graphiti/pull/407) Sort types in generated schema
+- [421](https://github.com/graphiti-api/graphiti/pull/421) Re-use resource class for remote sideloads to avoid memory leak
+- [452](https://github.com/graphiti-api/graphiti/pull/452) Resolve inconsistency for filters containing curly brackets
+- [446](https://github.com/graphiti-api/graphiti/pull/446) Fix private call
+
+## 1.3.9, May 25th 2022
+Use an options hash for log subscriber instead of positional arguments
+
+## 1.x ?? 
 
 Features:
 - [329](https://github.com/graphiti-api/graphiti/pull/329) Propagate `extra_fields` to related resource links.
