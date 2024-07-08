@@ -1,5 +1,27 @@
 graphiti changelog
 
+## [1.7.3](https://github.com/graphiti-api/graphiti/compare/v1.7.2...v1.7.3) (2024-06-26)
+
+
+### Bug Fixes
+
+* require OpenStruct explicitly ([#475](https://github.com/graphiti-api/graphiti/issues/475)) ([e0fa18a](https://github.com/graphiti-api/graphiti/commit/e0fa18a8d7f051e385e6e081f79f2ecae92a9260))
+
+## [1.7.2](https://github.com/graphiti-api/graphiti/compare/v1.7.1...v1.7.2) (2024-06-11)
+
+
+### Bug Fixes
+
+* require necessary ActiveSupport parts in proper order ([bb2a488](https://github.com/graphiti-api/graphiti/commit/bb2a48874a6533522df6eb027d0df8ec14c80a20))
+
+## [1.7.1](https://github.com/graphiti-api/graphiti/compare/v1.7.0...v1.7.1) (2024-04-18)
+
+
+### Bug Fixes
+
+* properly display .find vs .all in debugger statements ([d2a7a03](https://github.com/graphiti-api/graphiti/commit/d2a7a038a649818979d52ccd898e68dba78b051f))
+* rescue error from sideloads updated_at calculation, defaulting to the current time ([661e3b5](https://github.com/graphiti-api/graphiti/commit/661e3b5212e2649870a200067d0d5d52fa962637))
+
 # [1.7.0](https://github.com/graphiti-api/graphiti/compare/v1.6.4...v1.7.0) (2024-03-27)
 
 

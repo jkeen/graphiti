@@ -92,16 +92,17 @@ module Graphiti
     end
 
     def updated_at
-      updated_ats = sideload_resource_proxies.map(&:updated_at)
-
+      updated_time = nil
       begin
+        updated_ats = sideload_resource_proxies.map(&:updated_at)
         updated_ats << @object.maximum(:updated_at)
+        updated_time = updated_ats.compact.max
       rescue => e
-        Graphiti.log("error calculating last_modified_at for #{@resource.class}")
+        Graphiti.log(["error calculating last_modified_at for #{@resource.class}", :red])
         Graphiti.log(e)
       end
 
-      updated_ats.compact.max
+      updated_time || Time.now
     end
     alias_method :last_modified_at, :updated_at
 
@@ -128,9 +129,10 @@ module Graphiti
     def broadcast_data
       opts = {
         resource: @resource,
-        params: @opts[:params],
+        params: @opts[:params] || @query.params,
         sideload: @opts[:sideload],
-        parent: @opts[:parent]
+        parent: @opts[:parent],
+        action: @query.action
         # Set once data is resolved within block
         #   results: ...
       }
