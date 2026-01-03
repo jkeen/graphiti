@@ -1,5 +1,12 @@
 graphiti changelog
 
+# [1.9.0](https://github.com/graphiti-api/graphiti/compare/v1.8.2...v1.9.0) (2026-01-03)
+
+
+### Features
+
+* Support rails 8.1 ([#500](https://github.com/graphiti-api/graphiti/issues/500)) ([34d0cf0](https://github.com/graphiti-api/graphiti/commit/34d0cf03b6b4d887d10d660f0ae08bfa6833345f))
+
 ## [1.8.2](https://github.com/graphiti-api/graphiti/compare/v1.8.1...v1.8.2) (2025-05-20)
 
 
