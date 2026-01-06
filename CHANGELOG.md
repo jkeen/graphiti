@@ -1,5 +1,12 @@
 graphiti changelog
 
+# [1.10.0](https://github.com/graphiti-api/graphiti/compare/v1.9.0...v1.10.0) (2026-01-06)
+
+
+### Features
+
+* add cache tag support to allow context-aware caching ([#498](https://github.com/graphiti-api/graphiti/issues/498)) ([e8c2bad](https://github.com/graphiti-api/graphiti/commit/e8c2bad478cb3dd8dbd1a5e993b10f84046a0fa8))
+
 # [1.9.0](https://github.com/graphiti-api/graphiti/compare/v1.8.2...v1.9.0) (2026-01-03)
 
 
