@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.10.1](https://github.com/graphiti-api/graphiti/compare/v1.10.0...v1.10.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* make parse_fieldset more resilient ([#502](https://github.com/graphiti-api/graphiti/issues/502)) ([216213b](https://github.com/graphiti-api/graphiti/commit/216213bb643566e644c53727557a8e8c163ae6a1))
+
 # [1.10.0](https://github.com/graphiti-api/graphiti/compare/v1.9.0...v1.10.0) (2026-01-06)
 
 
