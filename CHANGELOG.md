@@ -1,5 +1,26 @@
 graphiti changelog
 
+## [1.10.1](https://github.com/graphiti-api/graphiti/compare/v1.10.0...v1.10.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* make parse_fieldset more resilient ([#502](https://github.com/graphiti-api/graphiti/issues/502)) ([216213b](https://github.com/graphiti-api/graphiti/commit/216213bb643566e644c53727557a8e8c163ae6a1))
+
+# [1.10.0](https://github.com/graphiti-api/graphiti/compare/v1.9.0...v1.10.0) (2026-01-06)
+
+
+### Features
+
+* add cache tag support to allow context-aware caching ([#498](https://github.com/graphiti-api/graphiti/issues/498)) ([e8c2bad](https://github.com/graphiti-api/graphiti/commit/e8c2bad478cb3dd8dbd1a5e993b10f84046a0fa8))
+
+# [1.9.0](https://github.com/graphiti-api/graphiti/compare/v1.8.2...v1.9.0) (2026-01-03)
+
+
+### Features
+
+* Support rails 8.1 ([#500](https://github.com/graphiti-api/graphiti/issues/500)) ([34d0cf0](https://github.com/graphiti-api/graphiti/commit/34d0cf03b6b4d887d10d660f0ae08bfa6833345f))
+
 ## [1.8.2](https://github.com/graphiti-api/graphiti/compare/v1.8.1...v1.8.2) (2025-05-20)
 
 
