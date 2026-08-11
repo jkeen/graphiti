@@ -22,6 +22,9 @@ module Graphiti
       @include_param = nested_include || @params[:include]
       @parents = parents
       @action = parse_action(action)
+      # Eagerly, because sideload scopes reach for it from pool threads and
+      # memoizing with ||= there is a read-check-assign race.
+      @entity_map = Concurrent::Map.new if parents.empty?
     end
 
     def association?
@@ -32,7 +35,7 @@ module Graphiti
     def entity_map
       return root.entity_map unless root == self
 
-      @entity_map ||= Concurrent::Map.new
+      @entity_map
     end
 
     def top_level?
