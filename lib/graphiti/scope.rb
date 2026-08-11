@@ -31,6 +31,30 @@ module Graphiti
       end
     end
 
+    POOL_THREAD = :__graphiti_pool_thread
+    private_constant :POOL_THREAD
+
+    # True on a pool thread, because blocking on the pool from inside it
+    # cannot be satisfied: the tasks that would end the wait queue behind the
+    # thread doing the waiting.
+    def self.resolve_synchronously?
+      !Graphiti.config.concurrency || on_pool_thread?
+    end
+
+    def self.on_pool_thread?
+      Thread.current[POOL_THREAD] == true
+    end
+
+    # Restores rather than clears: :caller_runs executes tasks on the
+    # submitting thread, which may be a request thread.
+    def self.marking_pool_thread
+      previous = Thread.current[POOL_THREAD]
+      Thread.current[POOL_THREAD] = true
+      yield
+    ensure
+      Thread.current[POOL_THREAD] = previous
+    end
+
     def initialize(object, resource, query, opts = {})
       @object = object
       @resource = resource
@@ -48,18 +72,18 @@ module Graphiti
       # Thread/Fiber storage snapshots, and Rails executor wrappers on every
       # request purely to drive a thread pool that is intentionally synchronous.
       # See https://github.com/graphiti-api/graphiti/issues/505
-      if Graphiti.config.concurrency
-        future_resolve(&blk).value!
-      else
+      if self.class.resolve_synchronously?
         sync_resolve(&blk)
+      else
+        future_resolve(&blk).value!
       end
     end
 
     def resolve_sideloads(results)
-      if Graphiti.config.concurrency
-        future_resolve_sideloads(results).value!
-      else
+      if self.class.resolve_synchronously?
         sync_resolve_sideloads(results)
+      else
+        future_resolve_sideloads(results).value!
       end
     end
 
@@ -203,6 +227,8 @@ module Graphiti
 
     def future_with_context(*args)
       thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
+        next if key == POOL_THREAD
+
         memo[key] = Thread.current[key]
       end
       fiber_storage =
@@ -215,11 +241,13 @@ module Graphiti
       Concurrent::Promises.future_on(
         self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
       ) do |thread_id, thread_storage, fiber_storage, *args|
-        wrap_in_rails_executor do
-          with_thread_locals(thread_storage) do
-            with_fiber_locals(fiber_storage) do
-              Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
-                yield(*args)
+        self.class.marking_pool_thread do
+          wrap_in_rails_executor do
+            with_thread_locals(thread_storage) do
+              with_fiber_locals(fiber_storage) do
+                Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+                  yield(*args)
+                end
               end
             end
           end
