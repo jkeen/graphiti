@@ -182,7 +182,7 @@ module Graphiti
       assign_serializer(resolved)
       yield resolved if block_given?
       @opts[:after_resolve]&.call(resolved)
-      resolved
+      @resolved_records = resolved
     end
 
     # Must run before sideloads assign, so every include path populates the
@@ -297,8 +297,15 @@ module Graphiti
 
     def sideload_resource_proxies
       @sideload_resource_proxies ||= begin
-        @object = @resource.before_resolve(@object, @query)
-        results = @resource.resolve(@object)
+        # Reached from the etag and last-modified paths, which run after the
+        # response has already been resolved. Resolving again re-runs every
+        # query and re-applies before_resolve to a scope it has already
+        # mutated.
+        results = @resolved_records
+        if results.nil?
+          @object = @resource.before_resolve(@object, @query)
+          results = @resource.resolve(@object)
+        end
 
         [].tap do |proxies|
           unless @query.sideloads.empty?
