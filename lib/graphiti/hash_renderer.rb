@@ -36,8 +36,8 @@ module Graphiti
         # The main logic here is just !!include[k]
         # But we also have special on__<type>--<name> includes
         # Where we only include when matching the polymorphic type
-        rels = @_relationships.select { |k, v|
-          if include[k]
+        rels = self.class.relationship_blocks.each_key.each_with_object({}) { |k, memo|
+          wanted = if include[k]
             true
           else
             included = false
@@ -53,6 +53,8 @@ module Graphiti
             end
             included
           end
+
+          memo[k] = _relationship(k) if wanted
         }
 
         rels.each_with_object({}) do |(k, v), h|

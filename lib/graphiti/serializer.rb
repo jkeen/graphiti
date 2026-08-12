@@ -48,8 +48,12 @@ module Graphiti
         # relationship can have the same name, and the attribute can be
         # conditional without affecting the relationship.
         def requested_relationships(fields)
-          @_relationships.select do |k, _|
-            _conditionally_included?(self.class.relationship_condition_blocks, k)
+          stripping = strip_relationships?
+          self.class.relationship_blocks.each_key.each_with_object({}) do |name, memo|
+            next unless _conditionally_included?(self.class.relationship_condition_blocks, name)
+            next if stripping && _stripped_relationship?(name)
+
+            memo[name] = _relationship(name)
           end
         end
       end
@@ -72,10 +76,49 @@ module Graphiti
       Base64.encode64({offset: offset}.to_json).chomp
     end
 
+    # Upstream builds a Relationship for every declared relationship here, then
+    # most are discarded: by #requested_relationships, or by
+    # #strip_relationships! when links are off. Building them on demand skips
+    # that. Otherwise this is upstream's body, so the dependency is pinned
+    # exactly and a spec guards its shape.
+    def initialize(exposures = {})
+      @_exposures = exposures
+      @_exposures.each { |key, value| instance_variable_set("@#{key}", value) }
+
+      @_id = instance_eval(&self.class.id_block).to_s
+      @_type = if (block = self.class.type_block)
+        instance_eval(&block).to_sym
+      else
+        self.class.type_val || :unknown
+      end
+      @_relationships = {}
+      @_meta = if (block = self.class.meta_block)
+        instance_eval(&block)
+      else
+        self.class.meta_val
+      end
+      @_linked = []
+    end
+
     def as_jsonapi(kwargs = {})
+      @_linked = kwargs[:include] || []
+      skipped = false
+
       super(**kwargs).tap do |hash|
+        skipped = self.class.relationship_blocks.length > (hash[:relationships]&.length || 0)
         strip_relationships!(hash) if strip_relationships?
+        # An empty relationships object is what stripping every relationship
+        # used to leave behind, and dropping the key is an output change.
+        hash[:relationships] ||= {} if skipped
         add_links!(hash)
+      end
+    end
+
+    def jsonapi_related(include)
+      include.each_with_object({}) do |name, memo|
+        next unless self.class.relationship_blocks.key?(name)
+
+        memo[name] = _relationship(name).related_resources
       end
     end
 
@@ -98,6 +141,23 @@ module Graphiti
       return unless @resource.respond_to?(:links?)
 
       hash[:links] = @resource.links(@object) if @resource.links?
+    end
+
+    def _relationship(name)
+      @_relationships[name] ||= JSONAPI::Serializable::Relationship.new(
+        @_exposures, self.class.relationship_options[name] || {}, &self.class.relationship_blocks[name]
+      )
+    end
+
+    # #strip_relationships! keeps only the ones carrying linkage, so anything
+    # that renders neither resource ids nor an include is built to be thrown
+    # away. A relationship with no registered sideload is a hand-written one,
+    # whose payload we cannot predict.
+    def _stripped_relationship?(name)
+      return false if @_linked.include?(name)
+
+      sideload = self.class.relationship_sideloads[name]
+      !sideload.nil? && !sideload.render_resource_ids?
     end
 
     def strip_relationships!(hash)

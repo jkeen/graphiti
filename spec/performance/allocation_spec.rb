@@ -92,11 +92,15 @@ RSpec.describe "allocation baselines" do
     end
   end
 
+  # Set rather than stubbed: a stub on a path this measures would allocate
+  # rspec-mocks bookkeeping and land in the numbers.
+  #
   # The pool constant is a delay resolved on first touch, so it has to be
   # replaced rather than reconfigured.
   def with_concurrency(mode)
     concurrent = mode == "on"
-    allow(Graphiti.config).to receive(:concurrency).and_return(concurrent)
+    previous = Graphiti.config.concurrency
+    Graphiti.config.concurrency = concurrent
     if concurrent
       stub_const(
         "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
@@ -108,6 +112,8 @@ RSpec.describe "allocation baselines" do
       )
     end
     yield
+  ensure
+    Graphiti.config.concurrency = previous
   end
 
   if ENV["PERF_BASELINE"] == "write"

@@ -18,7 +18,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 3.2"
 
-  spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
+  # Exact: Graphiti::Serializer#initialize reimplements this version's, so a
+  # newer one could add state the copy silently drops. See the canary in
+  # spec/serializer_upstream_spec.rb.
+  spec.add_dependency "jsonapi-serializable", "0.3.1"
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
   spec.add_dependency "rescue_registry", "~> 1.0"
