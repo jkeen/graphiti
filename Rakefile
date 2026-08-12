@@ -11,6 +11,19 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   end
 end
 
+namespace :performance do
+  desc "Rewrite spec/performance/baselines.yml from the current working tree"
+  task :baseline do
+    sh "PERF_BASELINE=write bundle exec rspec spec/performance"
+    puts "\nreview the diff before committing: a raised number is a regression you are accepting"
+  end
+
+  desc "Check allocations against the committed baselines"
+  task :check do
+    sh "bundle exec rspec spec/performance"
+  end
+end
+
 if ENV["APPRAISAL_INITIALIZED"]
   task default: [:spec]
 else
